@@ -7,7 +7,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from todo.domain.task import Task
+from todo.domain.task import Task, TaskStatus
 from todo.application.ports import TaskRepository
 
 
@@ -58,6 +58,7 @@ class SQLiteTaskRepository(TaskRepository):
                 status=task.status.value,
                 due_date=task.due_date,
             )
+
             session.add(orm_task)
             session.commit()
             session.refresh(orm_task)
@@ -65,7 +66,24 @@ class SQLiteTaskRepository(TaskRepository):
     def delete(self, task_id: int) -> None:
         with SessionLocal() as session:
             orm_task = session.get(TaskTable, task_id)
+
             if orm_task is None:
                 return
+            
             session.delete(orm_task)
             session.commit()
+    
+    def get(self, task_id: int) -> Task | None:
+        with SessionLocal() as session:
+            orm_task = session.get(TaskTable, task_id)
+
+            if orm_task is None:
+                return None
+            
+            return Task(
+                id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                status=TaskStatus(orm_task.status),
+                due_date=orm_task.due_date,
+            )

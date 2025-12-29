@@ -58,7 +58,10 @@ def api_create_task(payload: TaskCreate):
 
 @app.get("/tasks/{id}", response_model=TaskOut)
 def api_get_task(id: int):
-    pass  # TODO
+    task = repository.get(id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return to_out(task)
 
 
 @app.put("/tasks/{id}", response_model=TaskOut)
