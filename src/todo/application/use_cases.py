@@ -39,11 +39,14 @@ def delete_task(repository: TaskRepository, task_id: int) -> bool:
 
 
 # =========================
-# Récuperation d'une tache
+# Récuperation tache
 # =========================
 
 def get_task(repository: TaskRepository, task_id: int) -> Optional[Task]:
     return repository.get(task_id)
+
+def list_tasks(repository: TaskRepository) -> list[Task]:
+    return repository.list()
 
 
 # =========================

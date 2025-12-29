@@ -110,3 +110,18 @@ class SQLiteTaskRepository(TaskRepository):
                 status=TaskStatus(orm_task.status),
                 due_date=orm_task.due_date,
             )
+        
+    def list(self) -> list[Task]:
+        with SessionLocal() as session:
+            orm_tasks = session.query(TaskTable).all()
+            tasks = [
+                Task(
+                    id=orm_task.id,
+                    title=orm_task.title,
+                    description=orm_task.description,
+                    status=TaskStatus(orm_task.status),
+                    due_date=orm_task.due_date,
+                )
+                for orm_task in orm_tasks
+            ]
+            return tasks

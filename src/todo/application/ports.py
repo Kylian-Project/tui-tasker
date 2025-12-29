@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 from todo.domain.task import Task
 
@@ -24,4 +25,8 @@ class TaskRepository(ABC):
 
     @abstractmethod
     def update(self, task: Task) -> Task | None:
+        pass
+
+    @abstractmethod
+    def list(self) -> List[Task]:
         pass

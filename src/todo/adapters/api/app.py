@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -9,6 +9,8 @@ from todo.application.use_cases import (
     create_task,
     delete_task,
     update_task,
+    get_task,
+    list_tasks,
 )
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
 
@@ -65,11 +67,15 @@ def api_create_task(payload: TaskCreate):
 
 @app.get("/tasks/{id}", response_model=TaskOut)
 def api_get_task(id: int):
-    task = repository.get(id)
+    task = get_task(repository, id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return out(task)
 
+@app.get("/tasks", response_model=List[TaskOut])
+def api_list_tasks():
+    tasks = list_tasks(repository)
+    return [out(t) for t in tasks]
 
 @app.patch("/tasks/{id}", response_model=TaskOut)
 def api_update_task(id: int, payload: TaskUpdate):
