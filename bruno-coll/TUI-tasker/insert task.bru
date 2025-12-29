@@ -1,0 +1,25 @@
+meta {
+  name: insert task
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{local}}/tasks
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Rendre le projet",
+    "description": "Implémenter le projet complet avec interface TUI",
+    "due_date": "2025-01-25"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
