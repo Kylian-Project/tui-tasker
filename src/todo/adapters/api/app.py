@@ -8,6 +8,7 @@ from todo.domain.task import TaskStatus
 from todo.application.use_cases import (
     create_task,
     delete_task,
+    update_task,
 )
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
 
@@ -24,6 +25,12 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     due_date: Optional[date] = None
 
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[TaskStatus] = None
+    due_date: Optional[date] = None
+
 class TaskOut(BaseModel):
     id: int
     title: str
@@ -31,7 +38,7 @@ class TaskOut(BaseModel):
     status: TaskStatus
     due_date: Optional[date]
 
-def to_out(task) -> TaskOut:
+def out(task) -> TaskOut:
     return TaskOut(
         id=task.id,
         title=task.title,
@@ -53,7 +60,7 @@ def api_create_task(payload: TaskCreate):
         description=payload.description,
         due_date=payload.due_date,
     )
-    return to_out(task)
+    return out(task)
 
 
 @app.get("/tasks/{id}", response_model=TaskOut)
@@ -61,12 +68,24 @@ def api_get_task(id: int):
     task = repository.get(id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
-    return to_out(task)
+    return out(task)
 
 
-@app.put("/tasks/{id}", response_model=TaskOut)
-def api_update_task(id: int):
-    pass  # TODO
+@app.patch("/tasks/{id}", response_model=TaskOut)
+def api_update_task(id: int, payload: TaskUpdate):
+    updated = update_task(
+        repository=repository,
+        task_id=id,
+        title=payload.title,
+        description=payload.description,
+        status=payload.status,
+        due_date=payload.due_date,
+    )
+
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return out(updated)
 
 
 @app.delete("/tasks/{id}", status_code=204)

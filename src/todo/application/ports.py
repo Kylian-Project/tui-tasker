@@ -21,3 +21,7 @@ class TaskRepository(ABC):
     @abstractmethod
     def get(self, task_id: int) -> Task | None:
         pass
+
+    @abstractmethod
+    def update(self, task: Task) -> Task | None:
+        pass

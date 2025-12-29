@@ -87,3 +87,26 @@ class SQLiteTaskRepository(TaskRepository):
                 status=TaskStatus(orm_task.status),
                 due_date=orm_task.due_date,
             )
+
+    def update(self, task: Task) -> Task | None:
+        with SessionLocal() as session:
+            orm_task = session.get(TaskTable, task.id)
+
+            if orm_task is None:
+                return None
+
+            orm_task.title = task.title
+            orm_task.description = task.description
+            orm_task.status = task.status.value
+            orm_task.due_date = task.due_date
+
+            session.commit()
+            session.refresh(orm_task)
+
+            return Task(
+                id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                status=TaskStatus(orm_task.status),
+                due_date=orm_task.due_date,
+            )

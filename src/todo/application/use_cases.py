@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import date
 
-from todo.domain.task import Task
+from todo.domain.task import Task, TaskStatus
 from todo.application.ports import TaskRepository
 
 
@@ -44,3 +44,30 @@ def delete_task(repository: TaskRepository, task_id: int) -> bool:
 
 def get_task(repository: TaskRepository, task_id: int) -> Optional[Task]:
     return repository.get(task_id)
+
+
+# =========================
+# Mise a jour d'une tache
+# =========================
+def update_task(
+    repository: TaskRepository,
+    task_id: int,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    status: Optional[str] = None,
+    due_date: Optional[date] = None,
+) -> Optional[Task]:
+    task = repository.get(task_id)
+    if task is None:
+        return None
+
+    if title is not None:
+        task.title = title
+    if description is not None:
+        task.description = description
+    if status is not None:
+        task.status = TaskStatus(status)
+    if due_date is not None:
+        task.due_date = due_date
+
+    return repository.update(task)
