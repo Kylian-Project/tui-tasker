@@ -11,6 +11,7 @@ from todo.application.use_cases import (
     update_task,
     get_task,
     list_tasks,
+    change_task_status,
 )
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
 
@@ -90,6 +91,15 @@ def api_update_task(id: int, payload: TaskUpdate):
 
     if updated is None:
         raise HTTPException(status_code=404, detail="Task not found")
+    
+    if payload.status is not None:
+        task = change_task_status(
+            repository=repository,
+            task_id=id,
+            new_status=payload.status,
+        )
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
 
     return out(updated)
 

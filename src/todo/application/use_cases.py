@@ -74,3 +74,27 @@ def update_task(
         task.due_date = due_date
 
     return repository.update(task)
+
+# =========================
+# Changement de statut
+# =========================
+
+def change_task_status(
+    repository: TaskRepository,
+    task_id: int,
+    new_status: TaskStatus,
+) -> Optional[Task]:
+    task = repository.get(task_id)
+    if task is None:
+        return None
+
+    old_status = task.status
+
+    if new_status == TaskStatus.DONE:
+        task.mark_done()
+    elif new_status == TaskStatus.IN_PROGRESS:
+        task.mark_in_progress()
+
+    repository.update(task)
+
+    return task
