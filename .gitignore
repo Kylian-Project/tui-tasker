@@ -208,3 +208,6 @@ __marimo__/
 
 # SQLite database files
 *.db
+
+# Notification logs
+notifications.txt

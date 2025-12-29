@@ -14,9 +14,11 @@ from todo.application.use_cases import (
     change_task_status,
 )
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
+from todo.adapters.notifications.notif import Notif
 
 app = FastAPI(title="TUI-tasker API", version="1.0.0")
 repository = SQLiteTaskRepository()
+notifier = Notif("notifications.txt")
 
 
 # =========================
@@ -80,28 +82,44 @@ def api_list_tasks():
 
 @app.patch("/tasks/{id}", response_model=TaskOut)
 def api_update_task(id: int, payload: TaskUpdate):
-    updated = update_task(
-        repository=repository,
-        task_id=id,
-        title=payload.title,
-        description=payload.description,
-        status=payload.status,
-        due_date=payload.due_date,
-    )
-
-    if updated is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    
+    # Si le statut est fourni : on utilise change_task_status
     if payload.status is not None:
         task = change_task_status(
             repository=repository,
+            notifier=notifier,
             task_id=id,
             new_status=payload.status,
         )
         if task is None:
             raise HTTPException(status_code=404, detail="Task not found")
-
-    return out(updated)
+        
+        # On update les autres champs si besoin
+        updated = update_task(
+            repository=repository,
+            task_id=id,
+            title=payload.title,
+            description=payload.description,
+            status=None,
+            due_date=payload.due_date,
+        )
+        if updated is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        
+        return out(updated)
+    else:
+        # Sinon simple update
+        updated = update_task(
+            repository=repository,
+            task_id=id,
+            title=payload.title,
+            description=payload.description,
+            status=None,
+            due_date=payload.due_date,
+        )
+        if updated is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        
+        return out(updated)
 
 
 @app.delete("/tasks/{id}", status_code=204)

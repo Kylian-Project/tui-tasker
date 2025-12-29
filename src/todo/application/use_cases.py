@@ -2,7 +2,7 @@ from typing import Optional
 from datetime import date
 
 from todo.domain.task import Task, TaskStatus
-from todo.application.ports import TaskRepository
+from todo.application.ports import TaskRepository, Notifier
 
 
 # =========================
@@ -81,6 +81,7 @@ def update_task(
 
 def change_task_status(
     repository: TaskRepository,
+    notifier: Notifier,
     task_id: int,
     new_status: TaskStatus,
 ) -> Optional[Task]:
@@ -90,11 +91,16 @@ def change_task_status(
 
     old_status = task.status
 
-    if new_status == TaskStatus.DONE:
-        task.mark_done()
-    elif new_status == TaskStatus.IN_PROGRESS:
-        task.mark_in_progress()
+    if (old_status != new_status):
+        if new_status == TaskStatus.DONE:
+            task.mark_done()
+        elif new_status == TaskStatus.IN_PROGRESS:
+            task.mark_in_progress()
 
-    repository.update(task)
+        notifier.notify(
+            f"Tache {task.id} : statut changé de {old_status.value} à {task.status.value}"
+        )
+
+        repository.update(task)
 
     return task

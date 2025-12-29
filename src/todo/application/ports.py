@@ -30,3 +30,14 @@ class TaskRepository(ABC):
     @abstractmethod
     def list(self) -> List[Task]:
         pass
+
+# =========================
+# Port de notification
+# =========================
+
+class Notifier(ABC):
+    """Port pour le système de notification."""
+
+    @abstractmethod
+    def notify(self, message: str) -> None:
+        pass
