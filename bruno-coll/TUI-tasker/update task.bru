@@ -1,0 +1,23 @@
+meta {
+  name: update task
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{local}}/tasks/2
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "test maj"
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
