@@ -1,11 +1,11 @@
 meta {
-  name: delete task
+  name: list task
   type: http
-  seq: 5
+  seq: 3
 }
 
-delete {
-  url: {{local}}/tasks/3
+get {
+  url: {{local}}/tasks
   body: none
   auth: inherit
 }
