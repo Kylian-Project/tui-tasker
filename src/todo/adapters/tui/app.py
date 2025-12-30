@@ -40,7 +40,7 @@ class TaskApp(App):
 
         with Grid(id="main_grid"):
             yield Section("Tasks list", DataTable(id="task_table"), id="tasks_section")
-            yield Section("Details", Static("WIP"))
+            yield Section("Details", Static("", id="task_details"))
             yield Section("Actions", Static("WIP"))
 
         yield Footer()
@@ -48,11 +48,14 @@ class TaskApp(App):
     def on_mount(self) -> None:
         self.title = "Tasker TUI"
         self.sub_title = "0.1.0"
+        self.theme = "rose-pine-moon"
 
         table = self.query_one("#task_table", DataTable)
         table.add_columns("ID", "Title", "Status", "Due Date")
         table.cursor_type = "row"
-        table.zebra_stripes = True
+        self.refresh_task_table()
+    
+    def action_refresh(self) -> None:
         self.refresh_task_table()
 
     def refresh_task_table(self) -> None:
@@ -66,10 +69,58 @@ class TaskApp(App):
                 task.title,
                 task.status.value,
                 task.due_date.isoformat() if task.due_date else "N/A",
+                key=str(task.id),
             )
 
-    def action_refresh(self) -> None:
-        self.refresh_task_table()
+        if table.row_count:
+            table.move_cursor(row=0, column=0, scroll=True)
+            self.update_details(table.ordered_rows[0].key)
+        else:
+            self.query_one("#task_details", Static).update("No task selected.")
+
+    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
+        self.update_details(event.row_key)
+
+    def update_details(self, row_key) -> None:
+        details = self.query_one("#task_details", Static)
+
+        key_value = getattr(row_key, "value", row_key)
+
+        try:
+            task_id = int(str(key_value))
+        except ValueError:
+            details.update("No task selected.")
+            return
+
+        task = get_task(self.repo, task_id)
+        if not task:
+            details.update("Task not found.")
+            return
+
+        desc = (task.description or "").strip() or "—"
+        due = task.due_date.isoformat() if task.due_date else "—"
+
+        status_style = {
+            TaskStatus.DONE: "bold #1EFB9D",
+            TaskStatus.IN_PROGRESS: "bold #A187F0",
+        }.get(task.status, "bold")
+
+        details.update(
+            "\n".join(
+                [
+                    f"[b]ID:[/b] {task.id}",
+                    f"[b]Title:[/b] {task.title}",
+                    f"[b]Status:[/b] [{status_style}]{task.status.value}[/]",
+                    f"[b]Due date:[/b] {due}",
+                    "",
+                    "[b]Description:[/b]",
+                    f"{desc}",
+                ]
+            )
+        )
 
 def run_tui() -> None:
     TaskApp().run()
+
+if __name__ == "__main__":
+    run_tui()
