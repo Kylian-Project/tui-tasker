@@ -1,10 +1,10 @@
-# ------------------------------
+# ---------------- COLORS ----------------
 
 $background: #20212f;
 $prim: #d563a8;
 $second: #9775DC;
 
-# ------------------------------
+# ---------------- MAIN ----------------
 
 Container, Header, Footer {
     background: $background;
@@ -34,10 +34,44 @@ Section {
     row-span: 2;
 }
 
+# ---------------- TABLE ----------------
+
 DataTable {
     height: 1fr;
     width: 1fr;
+    color: white;
     background: transparent;
+
+    scrollbar-size: 1 1;
+    scrollbar-background: transparent;
+    scrollbar-background-hover: transparent;
+    scrollbar-background-active: transparent;
+    scrollbar-color: #892DE1;
+    scrollbar-color-hover: #A187F0;
+    scrollbar-color-active: #892DE1;
+    scrollbar-corner-color: transparent;
 }
 
-# ------------------------------
+DataTable > .datatable--header {
+    background: #892DE1;
+    color: white;
+    text-style: bold;
+}
+
+DataTable > .datatable--header-hover {
+    background: #892DE1;
+    color: white;
+}
+
+DataTable > .datatable--hover {
+    background: #60239F;
+    color: white;
+}
+
+DataTable > .datatable--cursor {
+    background: #A187F0;
+    color: #2C294A;
+    text-style: bold;
+}
+
+# ---------------- END ----------------
