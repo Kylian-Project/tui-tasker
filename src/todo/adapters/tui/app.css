@@ -1,0 +1,43 @@
+# ------------------------------
+
+$background: #20212f;
+$prim: #d563a8;
+$second: #9775DC;
+
+# ------------------------------
+
+Container, Header, Footer {
+    background: $background;
+}
+
+Header {
+    margin: 1;
+    color: $prim;
+}
+
+Section {
+    border: round $prim;
+    padding: 1;
+    height: 1fr;
+    width: 1fr;
+}
+
+#main_grid {
+    grid-size: 2 2;
+    grid-gutter: 1 1;
+    grid-columns: 1.5fr 1fr;
+    padding: 1;
+    height: 1fr;
+}
+
+#tasks_section {
+    row-span: 2;
+}
+
+DataTable {
+    height: 1fr;
+    width: 1fr;
+    background: transparent;
+}
+
+# ------------------------------
