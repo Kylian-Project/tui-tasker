@@ -23,12 +23,12 @@ class TaskApp(App):
     CSS_PATH = "app.css"
 
     BINDINGS = [
-        ("q", "quit", "Quitter"),
-        ("a", "add_task", "Ajouter"),
-        ("enter", "toggle_done", "Valider"),
-        ("d", "mark_done", "Terminer"),
-        ("x", "delete_task", "Supprimer"),
-        ("r", "refresh", "Rafraichir"),
+        ("q", "quit", "Exit"),
+        ("a", "add_task", "Add Task"),
+        ("enter", "toggle_done", "Validate"),
+        ("d", "mark_done", "Complete"),
+        ("x", "delete_task", "Delete"),
+        ("r", "refresh", "Refresh Tasks"),
     ]
 
     def __init__(self):
@@ -39,8 +39,8 @@ class TaskApp(App):
         yield Header()
 
         with Grid(id="main_grid"):
-            yield Section("Liste tâches", DataTable(id="task_table"), id="tasks_section")
-            yield Section("Détails", Static("WIP"))
+            yield Section("Tasks list", DataTable(id="task_table"), id="tasks_section")
+            yield Section("Details", Static("WIP"))
             yield Section("Actions", Static("WIP"))
 
         yield Footer()
