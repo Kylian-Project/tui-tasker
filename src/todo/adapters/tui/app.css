@@ -96,7 +96,7 @@ TaskActionScreen {
 
 OptionList {
     border: round #61225A;
-    background: #20212F;
+    background: $background;
     height: auto;
 }
 

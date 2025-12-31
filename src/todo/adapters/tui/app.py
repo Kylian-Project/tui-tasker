@@ -43,12 +43,12 @@ class TaskActionScreen(ModalScreen[str]):
         with Container(id="action_dialog"):
             yield Static(f"Task : #{self.task_id} • {self.task_title}", id="action_title")
             yield OptionList(
-                Option("Marquer comme terminée", id="done"),
-                Option("Marquer comme en cours", id="in_progress"),
+                Option("Mark as done", id="done"),
+                Option("Mark as in progress", id="in_progress"),
                 None,
-                Option("Supprimer la tâche", id="delete"),
+                Option("Delete task", id="delete"),
                 None,
-                Option("Annuler", id="cancel"),
+                Option("Cancel", id="cancel"),
                 id="action_list",
             )
 
@@ -319,9 +319,7 @@ class TaskApp(App):
                     f"[b]Title:[/b] {task.title}",
                     f"[b]Status:[/b] [{status_style}]{task.status.value}[/]",
                     f"[b]Due date:[/b] {due}",
-                    "",
-                    "[b]Description:[/b]",
-                    f"{desc}",
+                    f"[b]Description:[/b] {desc}",
                 ]
             )
         )
