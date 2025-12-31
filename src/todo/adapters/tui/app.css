@@ -74,4 +74,36 @@ DataTable > .datatable--cursor {
     text-style: bold;
 }
 
+# ---------------- TASK ACTIONS ----------------
+
+TaskActionScreen {
+    align: center middle;
+}
+
+#action_dialog {
+    width: 52;
+    height: auto;
+    padding: 1 2;
+    border: round #BD57B4;
+    background: #2C294A;
+}
+
+#action_title {
+    text-style: bold;
+    color: white;
+    margin: 0 0 1 0;
+}
+
+OptionList {
+    border: round #61225A;
+    background: #20212F;
+    height: auto;
+}
+
+OptionList > .option-list--option-highlighted {
+    background: #892DE1;
+    color: white;
+    text-style: bold;
+}
+
 # ---------------- END ----------------
