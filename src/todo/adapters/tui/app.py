@@ -228,13 +228,21 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
 
         self.dismiss({"title": title, "due_date": due, "description": description})
 
+class TaskTable(DataTable):
+    BINDINGS = [
+        Binding("enter", "open_actions", "Open action menu"),
+    ]
+
+    def action_open_actions(self) -> None:
+        self.app.action_open_actions()
+
 class TaskApp(App):
     CSS_PATH = "app.css"
 
     BINDINGS = [
-        ("q", "quit", "Exit"),
         ("a", "add_task", "Add Task"),
         ("r", "refresh", "Refresh Tasks"),
+        ("q", "quit", "Exit"),
     ]
 
     def __init__(self):
@@ -247,9 +255,9 @@ class TaskApp(App):
         yield Header()
 
         with Grid(id="main_grid"):
-            yield Section("Tasks list", DataTable(id="task_table"), id="tasks_section")
+            yield Section("Tasks list", TaskTable(id="task_table"), id="tasks_section")
             yield Section("Details", Static("", id="task_details"))
-            yield Section("Calendar", Static("WIP"))
+            yield Section("Other", Static("WIP"))
 
         yield Footer()
 
@@ -262,6 +270,27 @@ class TaskApp(App):
         table.add_columns("ID", "Title", "Status", "Due Date")
         table.cursor_type = "row"
         self.refresh_task_table()
+
+    def action_open_actions(self) -> None:
+        table = self.query_one("#task_table", TaskTable)
+
+        if table.row_count == 0:
+            self.bell()
+            return
+
+        row_key = table.ordered_rows[table.cursor_row].key
+        task_id = self.row_key_to_task_id(row_key)
+        if task_id is None:
+            self.bell()
+            return
+
+        task = get_task(self.repo, task_id)
+        title = task.title if task else "Unknown"
+
+        self.push_screen(
+            TaskActionScreen(task_id, title),
+            callback=partial(self.task_action, task_id),
+        )
     
     def action_refresh(self) -> None:
         self.refresh_task_table(select_task_id=self._selected_task_id)
