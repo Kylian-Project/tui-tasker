@@ -106,4 +106,34 @@ OptionList > .option-list--option-highlighted {
     text-style: bold;
 }
 
+# ---------------- CREATE TASK ----------------
+
+#create_title {
+    margin: 0;
+    color: white;
+    text-style: bold;
+    border: round $prim;
+    padding: 1;
+}
+
+#create_title_input {
+    margin: 0 0 1 0;
+    width: 100%;
+}
+
+#create_error {
+    color: red;
+    margin: 0 0 1 1;
+}
+
+#create_due_input {
+    margin: 0 0 1 0;
+    width: 100%;
+}
+
+#create_desc_input {
+    margin: 0 0 1 0;
+    width: 100%;
+}
+
 # ---------------- END ----------------

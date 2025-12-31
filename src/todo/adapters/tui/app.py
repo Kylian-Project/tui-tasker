@@ -1,11 +1,12 @@
 from textual.app import App, ComposeResult
 from textual.containers import Container, Grid
-from textual.widgets import DataTable, Footer, Header, Static, OptionList
+from textual.widgets import DataTable, Footer, Header, Static, OptionList, Input, TextArea
 from textual.widgets.option_list import Option
 from textual.screen import ModalScreen
 
-from typing import Optional
+from typing import Any, Optional
 from functools import partial
+from datetime import date
 
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
 from todo.adapters.notifications.notif import Notif
@@ -60,11 +61,79 @@ class TaskActionScreen(ModalScreen[str]):
         self.dismiss(event.option_id or "cancel")
 
 
+class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
+    BINDINGS = [
+        ("escape", "cancel", "Cancel"),
+        ("ctrl+s", "save", "Save"),
+    ]
+
+    def compose(self) -> ComposeResult:
+        with Container(id="create_dialog"):
+            yield Static("Create a task", id="create_title")
+            yield Static("", id="create_error")
+
+            yield Input(placeholder="Title (required)", id="create_title_input")
+            yield Input(placeholder="Due date YYYY-MM-DD (optional)", id="create_due_input")
+            yield TextArea(placeholder="Description (optional)", id="create_desc_input")
+
+            yield OptionList(
+                Option("Create (Ctrl+S)", id="create"),
+                Option("Cancel (Esc)", id="cancel"),
+                id="create_actions",
+            )
+
+    def on_mount(self) -> None:
+        self.query_one("#create_title_input", Input).focus()
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+    def action_save(self) -> None:
+        self.submit()
+
+    def on_inputsubmitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "create_title_input":
+            self.query_one("#create_due_input", Input).focus()
+        elif event.input.id == "create_due_input":
+            self.query_one("#create_desc_input", TextArea).focus()
+
+    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+        if event.option_id == "create":
+            self.submit()
+        else:
+            self.dismiss(None)
+
+    def set_error(self, message: str) -> None:
+        self.query_one("#create_error", Static).update(message)
+        self.app.bell()
+
+    def submit(self) -> None:
+        title = self.query_one("#create_title_input", Input).value.strip()
+        due_raw = self.query_one("#create_due_input", Input).value.strip()
+        desc = self.query_one("#create_desc_input", TextArea).text.strip() or None
+
+        if not title:
+            self.set_error("> Title is required.")
+            self.query_one("#create_title_input", Input).focus()
+            return
+
+        due: date | None = None
+        if due_raw:
+            try:
+                due = date.fromisoformat(due_raw)
+            except ValueError:
+                self.set_error("> Invalid date. Expected format: YYYY-MM-DD")
+                self.query_one("#create_due_input", Input).focus()
+                return
+
+        self.dismiss({"title": title, "due_date": due, "description": desc})
+
 class TaskApp(App):
     CSS_PATH = "app.css"
 
     BINDINGS = [
         ("q", "quit", "Exit"),
+        ("a", "add_task", "Add Task"),
         ("r", "refresh", "Refresh Tasks"),
     ]
 
@@ -96,6 +165,33 @@ class TaskApp(App):
     
     def action_refresh(self) -> None:
         self.refresh_task_table(select_task_id=self._selected_task_id)
+
+    def action_add_task(self) -> None:
+        self.push_screen(CreateTaskScreen(), callback=self.create_task)
+
+    def create_task(self, payload: dict[str, Any] | None) -> None:
+        table = self.query_one("#task_table", DataTable)
+        table.focus()
+
+        if not payload:
+            return
+
+        title: str = payload["title"]
+        due_date: date | None = payload.get("due_date")
+        description: str | None = payload.get("description")
+
+        try:
+            created = create_task(
+                repository=self.repo,
+                title=title,
+                due_date=due_date,
+                description=description,
+            )
+        except TypeError:
+            created = create_task(repository=self.repo, title=title, due_date=due_date)
+
+        created_id = getattr(created, "id", None)
+        self.refresh_task_table(select_task_id=created_id)
 
     # ---------------- Table ----------------
 
