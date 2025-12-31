@@ -14,7 +14,8 @@ dependencies = [
     "pydantic (>=2.12.5,<3.0.0)",
     "uvicorn (>=0.40.0,<0.41.0)",
     "rich (>=14.2.0,<15.0.0)",
-    "textual (>=6.11.0,<7.0.0)"
+    "textual (>=6.11.0,<7.0.0)",
+    "textual-timepiece (>=0.6.0,<0.7.0)"
 ]
 
 [tool.poetry]

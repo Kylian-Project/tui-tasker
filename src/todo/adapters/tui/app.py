@@ -7,6 +7,7 @@ from textual.screen import ModalScreen
 from typing import Any, Optional
 from functools import partial
 from datetime import date
+from textual_timepiece.pickers import DatePicker
 
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
 from todo.adapters.notifications.notif import Notif
@@ -72,8 +73,10 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
             yield Static("Create a task", id="create_title")
             yield Static("", id="create_error")
 
-            yield Input(placeholder="Title (required)", id="create_title_input")
-            yield Input(placeholder="Due date YYYY-MM-DD (optional)", id="create_due_input")
+            with Grid(id="create_row_title_date"):
+                yield Input(placeholder="Title (required)", id="create_title_input")
+                yield DatePicker(id="create_due_input")
+
             yield TextArea(placeholder="Description (optional)", id="create_desc_input")
 
             yield OptionList(
@@ -93,7 +96,7 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
 
     def on_inputsubmitted(self, event: Input.Submitted) -> None:
         if event.input.id == "create_title_input":
-            self.query_one("#create_due_input", Input).focus()
+            self.query_one("#create_due_input", DatePicker).focus()
         elif event.input.id == "create_due_input":
             self.query_one("#create_desc_input", TextArea).focus()
 
@@ -109,7 +112,6 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
 
     def submit(self) -> None:
         title = self.query_one("#create_title_input", Input).value.strip()
-        due_raw = self.query_one("#create_due_input", Input).value.strip()
         desc = self.query_one("#create_desc_input", TextArea).text.strip() or None
 
         if not title:
@@ -117,15 +119,12 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
             self.query_one("#create_title_input", Input).focus()
             return
 
-        due: date | None = None
-        if due_raw:
-            try:
-                due = date.fromisoformat(due_raw)
-            except ValueError:
-                self.set_error("> Invalid date. Expected format: YYYY-MM-DD")
-                self.query_one("#create_due_input", Input).focus()
-                return
+        picker = self.query_one("#create_due_input", DatePicker)
+        due_before = picker.date
 
+        due: date | None = None
+        if due_before is not None:
+            due = date(due_before.year, due_before.month, due_before.day)
         self.dismiss({"title": title, "due_date": due, "description": desc})
 
 class TaskApp(App):
