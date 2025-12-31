@@ -106,9 +106,9 @@ OptionList > .option-list--option-highlighted {
     text-style: bold;
 }
 
-# ---------------- CREATE TASK ----------------
+# ---------------- CREATE TASK & EDIT TASK ----------------
 
-#create_title {
+#create_title, #edit_title {
     margin: 0;
     color: white;
     text-style: bold;
@@ -116,17 +116,17 @@ OptionList > .option-list--option-highlighted {
     padding: 1;
 }
 
-#create_error {
+#create_error, #edit_error {
     color: red;
     margin: 0 0 1 1;
 }
 
-#create_desc_input {
+#create_desc_input, #edit_desc_input {
     margin: 0 0 1 0;
     width: 100%;
 }
 
-#create_row_title_date {
+#create_row_title_date, #edit_row_title_date {
     grid-size: 2 1;
     grid-columns: 2fr 1fr;
     grid-gutter: 1 0;

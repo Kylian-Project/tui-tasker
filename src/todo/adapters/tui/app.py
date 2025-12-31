@@ -7,6 +7,7 @@ from textual.screen import ModalScreen
 from typing import Any, Optional
 from functools import partial
 from datetime import date
+from whenever import Date as WheneverDate # type used to set date in DatePicker
 from textual_timepiece.pickers import DatePicker
 
 from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
@@ -43,6 +44,8 @@ class TaskActionScreen(ModalScreen[str]):
         with Container(id="action_dialog"):
             yield Static(f"Task : #{self.task_id} • {self.task_title}", id="action_title")
             yield OptionList(
+                Option("Edit", id="edit"),
+                None,
                 Option("Mark as done", id="done"),
                 Option("Mark as in progress", id="in_progress"),
                 None,
@@ -94,11 +97,9 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
     def action_save(self) -> None:
         self.submit()
 
-    def on_inputsubmitted(self, event: Input.Submitted) -> None:
+    def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id == "create_title_input":
             self.query_one("#create_due_input", DatePicker).focus()
-        elif event.input.id == "create_due_input":
-            self.query_one("#create_desc_input", TextArea).focus()
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         if event.option_id == "create":
@@ -126,6 +127,94 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
         if due_before is not None:
             due = date(due_before.year, due_before.month, due_before.day)
         self.dismiss({"title": title, "due_date": due, "description": desc})
+
+class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
+    BINDINGS = [
+        ("escape", "cancel", "Cancel"),
+        ("ctrl+s", "save", "Save"),
+    ]
+
+    def __init__(self, task_id: int, title: str, description: str | None, due_date: date | None):
+        super().__init__()
+        self.task_id = task_id
+        self.initial_title = title
+        self.initial_description = description
+        self.initial_due_date = due_date
+
+    def compose(self) -> ComposeResult:
+        with Container(id="edit_dialog"):
+            yield Static(f"Edit task #{self.task_id}", id="edit_title")
+            yield Static("", id="edit_error")
+
+            with Grid(id="edit_row_title_date"):
+                yield Input(placeholder="Title (required)", id="edit_title_input")
+                yield DatePicker(id="edit_due_input")
+
+            yield TextArea(placeholder="Description (optional)", id="edit_desc_input")
+
+            yield OptionList(
+                Option("Save (Ctrl+S)", id="save"),
+                Option("Cancel (Esc)", id="cancel"),
+                id="edit_actions",
+            )
+
+    def on_mount(self) -> None:
+        title_in = self.query_one("#edit_title_input", Input)
+        desc_in = self.query_one("#edit_desc_input", TextArea)
+        picker = self.query_one("#edit_due_input", DatePicker)
+
+        title_in.value = self.initial_title
+        desc_in.text = self.initial_description or ""
+
+        if self.initial_due_date is not None:
+            picker.date = WheneverDate(
+                self.initial_due_date.year,
+                self.initial_due_date.month,
+                self.initial_due_date.day,
+            )
+
+        title_in.focus()
+
+    def action_cancel(self) -> None:
+        self.dismiss(None)
+
+    def action_save(self) -> None:
+        self.submit()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "edit_title_input":
+            self.query_one("#edit_due_input", DatePicker).focus()
+
+    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+        if event.option_id == "save":
+            self.submit()
+        else:
+            self.dismiss(None)
+
+    def set_error(self, message: str) -> None:
+        self.query_one("#edit_error", Static).update(message)
+        self.app.bell()
+
+    def submit(self) -> None:
+        title = self.query_one("#edit_title_input", Input).value.strip()
+        desc_text = self.query_one("#edit_desc_input", TextArea).text
+
+        if not title:
+            self.set_error("> Title is required.")
+            self.query_one("#edit_title_input", Input).focus()
+            return
+
+        picker = self.query_one("#edit_due_input", DatePicker)
+        due_before = picker.date
+        due: date | None = None
+        if due_before is not None:
+            due = date(due_before.year, due_before.month, due_before.day)
+
+        description = desc_text.strip()
+        if description == "":
+            description = ""
+
+        self.dismiss({"title": title, "due_date": due, "description": description})
 
 class TaskApp(App):
     CSS_PATH = "app.css"
@@ -254,6 +343,19 @@ class TaskApp(App):
             table.focus()
             return
 
+        if action == "edit":
+            task = get_task(self.repo, task_id)
+            if not task:
+                self.bell()
+                table.focus()
+                return
+
+            self.push_screen(
+                EditTaskScreen(task.id, task.title, task.description, task.due_date),
+                callback=partial(self.edit_task, task_id, fallback_row),
+            )
+            return
+
         if action == "delete":
             delete_task(self.repo, task_id)
             self.refresh_task_table(select_task_id=None, fallback_row=fallback_row)
@@ -277,6 +379,25 @@ class TaskApp(App):
 
         self.refresh_task_table(select_task_id=task_id, fallback_row=fallback_row)
         table.focus()
+
+    def edit_task(self, task_id: int, fallback_row: int, payload: dict[str, Any] | None) -> None:
+        table = self.query_one("#task_table", DataTable)
+        table.focus()
+
+        if not payload:
+            return
+
+        updated = update_task(
+            repository=self.repo,
+            task_id=task_id,
+            title=payload.get("title"),
+            description=payload.get("description"),
+            due_date=payload.get("due_date"),
+            status=None,
+        )
+
+        selected = getattr(updated, "id", None) or task_id
+        self.refresh_task_table(select_task_id=selected, fallback_row=fallback_row)
 
     def row_key_to_task_id(self, row_key) -> int | None:
         key_value = getattr(row_key, "value", row_key)
