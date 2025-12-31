@@ -72,6 +72,8 @@ def update_task(
         task.status = TaskStatus(status)
     if due_date is not None:
         task.due_date = due_date
+    else:
+        task.due_date = None
 
     return repository.update(task)
 

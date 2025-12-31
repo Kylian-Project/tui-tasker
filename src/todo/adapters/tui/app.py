@@ -3,6 +3,7 @@ from textual.containers import Container, Grid
 from textual.widgets import DataTable, Footer, Header, Static, OptionList, Input, TextArea
 from textual.widgets.option_list import Option
 from textual.screen import ModalScreen
+from textual.binding import Binding
 
 from typing import Any, Optional
 from functools import partial
@@ -130,8 +131,9 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
 
 class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
     BINDINGS = [
-        ("escape", "cancel", "Cancel"),
-        ("ctrl+s", "save", "Save"),
+        Binding("escape", "cancel", "Cancel"),
+        Binding("ctrl+s", "save", "Save", priority=True),
+        Binding("ctrl+d", "clear_due", "Clear Date", priority=True),
     ]
 
     def __init__(self, task_id: int, title: str, description: str | None, due_date: date | None):
@@ -154,6 +156,7 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
 
             yield OptionList(
                 Option("Save (Ctrl+S)", id="save"),
+                Option("Clear date (Ctrl+D)", id="clear_due"),
                 Option("Cancel (Esc)", id="cancel"),
                 id="edit_actions",
             )
@@ -181,11 +184,20 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
     def action_save(self) -> None:
         self.submit()
 
+    def action_clear_due(self) -> None:
+        self.query_one("#edit_due_input", DatePicker).action_clear()
+        self.query_one("#edit_due_input", DatePicker).focus()
+
     def on_input_submitted(self, event: Input.Submitted) -> None:
         if event.input.id == "edit_title_input":
             self.query_one("#edit_due_input", DatePicker).focus()
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+        if event.option_id == "clear_due":
+            self.query_one("#edit_due_input", DatePicker).action_clear()
+            self.query_one("#edit_due_input", DatePicker).focus()
+            return
+
         if event.option_id == "save":
             self.submit()
         else:
