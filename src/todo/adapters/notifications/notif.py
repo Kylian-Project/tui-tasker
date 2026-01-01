@@ -8,7 +8,7 @@ class Notif(Notifier):
         self.path = path
 
     def notify(self, message: str) -> None:
-        timestamp = datetime.now().isoformat(timespec="seconds")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(f"[{timestamp}] {message}\n")

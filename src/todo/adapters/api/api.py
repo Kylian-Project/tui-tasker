@@ -61,6 +61,7 @@ def out(task) -> TaskOut:
 def api_create_task(payload: TaskCreate):
     task = create_task(
         repository=repository,
+        notifier=notifier,
         title=payload.title,
         description=payload.description,
         due_date=payload.due_date,
@@ -96,6 +97,7 @@ def api_update_task(id: int, payload: TaskUpdate):
         # On update les autres champs si besoin
         updated = update_task(
             repository=repository,
+            notifier=notifier,
             task_id=id,
             title=payload.title,
             description=payload.description,
@@ -110,6 +112,7 @@ def api_update_task(id: int, payload: TaskUpdate):
         # Sinon simple update
         updated = update_task(
             repository=repository,
+            notifier=notifier,
             task_id=id,
             title=payload.title,
             description=payload.description,
@@ -124,7 +127,7 @@ def api_update_task(id: int, payload: TaskUpdate):
 
 @app.delete("/tasks/{id}", status_code=204)
 def api_delete_task(id: int):
-    ok = delete_task(repository, id)
+    ok = delete_task(repository, notifier, id)
     if not ok:
         raise HTTPException(status_code=404, detail="Task not found")
     return None

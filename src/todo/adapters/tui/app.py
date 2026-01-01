@@ -333,12 +333,13 @@ class TaskApp(App):
         try:
             created = create_task(
                 repository=self.repo,
+                notifier=self.notifier,
                 title=title,
                 due_date=due_date,
                 description=description,
             )
         except TypeError:
-            created = create_task(repository=self.repo, title=title, due_date=due_date)
+            created = create_task(repository=self.repo, notifier=self.notifier, title=title, due_date=due_date)
 
         created_id = getattr(created, "id", None)
         self.refresh_task_table(select_task_id=created_id)
@@ -421,7 +422,7 @@ class TaskApp(App):
             return
 
         if action == "delete":
-            delete_task(self.repo, task_id)
+            delete_task(self.repo, self.notifier, task_id)
             self.refresh_task_table(select_task_id=None, fallback_row=fallback_row)
             table.focus()
             return
@@ -453,6 +454,7 @@ class TaskApp(App):
 
         updated = update_task(
             repository=self.repo,
+            notifier=self.notifier,
             task_id=task_id,
             title=payload.get("title"),
             description=payload.get("description"),

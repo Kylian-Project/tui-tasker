@@ -11,6 +11,7 @@ from todo.application.ports import TaskRepository, Notifier
 
 def create_task(
     repository: TaskRepository,
+    notifier: Notifier,
     title: str,
     description: Optional[str] = None,
     due_date: Optional[date] = None,
@@ -22,6 +23,7 @@ def create_task(
         due_date=due_date,
     )
     repository.add(task)
+    notifier.notify(f"Tâche créée : {task.title} (id={task.id})")
     return task
 
 
@@ -29,12 +31,13 @@ def create_task(
 # Suppression d'une tache
 # =========================
 
-def delete_task(repository: TaskRepository, task_id: int) -> bool:
+def delete_task(repository: TaskRepository, notifier: Notifier, task_id: int) -> bool:
     task = repository.get(task_id)
     if task is None:
         return False
 
     repository.delete(task_id)
+    notifier.notify(f"Tâche supprimée : {task.title} (id={task.id})")
     return True
 
 
@@ -69,6 +72,7 @@ def update_overdue_tasks(repository: TaskRepository, tasks: list[Task]) -> None:
 # =========================
 def update_task(
     repository: TaskRepository,
+    notifier: Notifier,
     task_id: int,
     title: Optional[str] = None,
     description: Optional[str] = None,
@@ -78,6 +82,8 @@ def update_task(
     task = repository.get(task_id)
     if task is None:
         return None
+
+    before = (task.title, task.description, task.status, task.due_date)
 
     if title is not None:
         task.title = title
@@ -94,7 +100,11 @@ def update_task(
     else:
         task.due_date = None
 
-    return repository.update(task)
+    updated = repository.update(task)
+    after = (task.title, task.description, task.status, task.due_date)
+    if before != after:
+        notifier.notify(f"Tâche modifiée : {task.title} (id={task.id})")
+    return updated
 
 # =========================
 # Changement de statut
@@ -112,19 +122,18 @@ def change_task_status(
 
     old_status = task.status
 
-    if (old_status != new_status):
-        if new_status == TaskStatus.DONE:
-            task.mark_done()
-        elif new_status == TaskStatus.IN_PROGRESS:
-            task.mark_in_progress()
-        
-        if task.is_overdue():
-            task.mark_overdue()
+    if new_status == TaskStatus.DONE:
+        task.mark_done()
+    elif new_status == TaskStatus.IN_PROGRESS:
+        task.mark_in_progress()
 
+    if task.is_overdue():
+        task.mark_overdue()
+
+    if old_status != task.status:
         notifier.notify(
             f"Tache {task.id} : statut changé de {old_status.value} à {task.status.value}"
         )
 
-        repository.update(task)
-
+    repository.update(task)
     return task
