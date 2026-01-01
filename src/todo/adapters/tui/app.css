@@ -134,4 +134,60 @@ OptionList > .option-list--option-highlighted {
     margin: 0 0 1 0;
 }
 
+# ---------------- STATS ----------------
+
+RichLog {
+    height: 1fr;
+    width: 1fr;
+    background: transparent;
+
+    scrollbar-size: 1 1;
+    scrollbar-background: transparent;
+    scrollbar-background-hover: transparent;
+    scrollbar-background-active: transparent;
+    scrollbar-color: #892DE1;
+    scrollbar-color-hover: #A187F0;
+    scrollbar-color-active: #892DE1;
+    scrollbar-corner-color: transparent;
+}
+
+#lbl_done {
+    color: #1EFB9D;
+}
+
+#lbl_in_progress {
+    color: #A187F0;
+}
+
+#lbl_overdue {
+    color: #FC4949;
+}
+
+#pb_done Bar > .bar--bar {
+    color: #1EFB9D;
+    background: #1EFB9D 30%;
+}
+
+#pb_done Bar > .bar--complete {
+    color: #1EFB9D;
+}
+
+#pb_in_progress Bar > .bar--bar {
+    color: #A187F0;
+    background: #A187F0 30%;
+}
+
+#pb_in_progress Bar > .bar--complete {
+    color: #A187F0;
+}
+
+#pb_overdue Bar > .bar--bar {
+    color: #FC4949;
+    background: #FC4949 30%;
+}
+
+#pb_overdue Bar > .bar--complete {
+    color: #FC4949;
+}
+
 # ---------------- END ----------------

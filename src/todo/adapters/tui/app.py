@@ -1,6 +1,6 @@
 from textual.app import App, ComposeResult
 from textual.containers import Container, Grid
-from textual.widgets import DataTable, Footer, Header, Static, OptionList, Input, TextArea
+from textual.widgets import DataTable, Footer, Header, Static, OptionList, Input, TextArea, ProgressBar, RichLog, TabbedContent, TabPane
 from textual.widgets.option_list import Option
 from textual.screen import ModalScreen
 from textual.binding import Binding
@@ -236,6 +236,22 @@ class TaskTable(DataTable):
     def action_open_actions(self) -> None:
         self.app.action_open_actions()
 
+class OtherPanel(Container):
+    def compose(self) -> ComposeResult:
+        with TabbedContent(id="other_tabs"):
+            with TabPane("Stats", id="tab_stats"):
+                yield Static("Done", id="lbl_done")
+                yield ProgressBar(total=1, show_eta=False, id="pb_done")
+
+                yield Static("In Progress", id="lbl_in_progress")
+                yield ProgressBar(total=1, show_eta=False, id="pb_in_progress")
+
+                yield Static("Overdue", id="lbl_overdue")
+                yield ProgressBar(total=1, show_eta=False, id="pb_overdue")
+
+            with TabPane("Logs", id="tab_logs"):
+                yield RichLog(id="activity_log", markup=True, highlight=True, auto_scroll=True)
+
 class TaskApp(App):
     CSS_PATH = "app.css"
 
@@ -248,7 +264,9 @@ class TaskApp(App):
     def __init__(self):
         super().__init__()
         self.repo = SQLiteTaskRepository()
-        self.notifier = Notif("notifications.txt")
+        self._notif_path = "notifications.txt"
+        self._notif_offset = 0 # Ne pas lire les anciennes notifications
+        self.notifier = Notif(self._notif_path)
         self._selected_task_id: Optional[int] = None
 
     def compose(self) -> ComposeResult:
@@ -257,7 +275,7 @@ class TaskApp(App):
         with Grid(id="main_grid"):
             yield Section("Tasks list", TaskTable(id="task_table"), id="tasks_section")
             yield Section("Details", Static("", id="task_details"))
-            yield Section("Other", Static("WIP"))
+            yield Section("Infos", OtherPanel(), id="infos_section")
 
         yield Footer()
 
@@ -270,6 +288,9 @@ class TaskApp(App):
         table.add_columns("ID", "Title", "Status", "Due Date")
         table.cursor_type = "row"
         self.refresh_task_table()
+
+        self.init_activity_log()
+        self.set_interval(0.5, self.sec_notifications)
 
     def action_open_actions(self) -> None:
         table = self.query_one("#task_table", TaskTable)
@@ -337,6 +358,8 @@ class TaskApp(App):
                 task.due_date.isoformat() if task.due_date else "N/A",
                 key=str(task.id),
             )
+        
+        self.update_stats(tasks)
 
         if table.row_count == 0:
             self._selected_task_id = None
@@ -472,6 +495,7 @@ class TaskApp(App):
         status_style = {
             TaskStatus.DONE: "bold #1EFB9D",
             TaskStatus.IN_PROGRESS: "bold #A187F0",
+            TaskStatus.OVERDUE: "bold #FC4949",
         }.get(task.status, "bold")
 
         details.update(
@@ -485,6 +509,64 @@ class TaskApp(App):
                 ]
             )
         )
+
+    # ---------------- Stats ----------------
+
+    def update_stats(self, tasks) -> None:
+        total = len(tasks)
+        done = sum(1 for t in tasks if t.status == TaskStatus.DONE)
+        in_progress = sum(1 for t in tasks if t.status == TaskStatus.IN_PROGRESS)
+        today = date.today()
+        overdue = sum(1 for t in tasks if t.status == TaskStatus.OVERDUE)
+
+        self.query_one("#lbl_done", Static).update(f"Done {done}/{total}")
+        self.query_one("#lbl_in_progress", Static).update(f"In Progress {in_progress}/{total}")
+        self.query_one("#lbl_overdue", Static).update(f"Overdue {overdue}/{total}")
+
+        pb_done = self.query_one("#pb_done", ProgressBar)
+        pb_done.total = max(total, 1)
+        pb_done.progress = done
+
+        pb_in_progress = self.query_one("#pb_in_progress", ProgressBar)
+        pb_in_progress.total = max(total, 1)
+        pb_in_progress.progress = in_progress
+
+        pb_overdue = self.query_one("#pb_overdue", ProgressBar)
+        pb_overdue.total = max(total, 1)
+        pb_overdue.progress = overdue
+
+
+    def init_activity_log(self) -> None:
+        log = self.query_one("#activity_log", RichLog)
+        log.clear()
+
+        try:
+            with open(self._notif_path, "r", encoding="utf-8") as f:
+                for line in f.read().splitlines():
+                    if line.strip():
+                        log.write(line)
+                self._notif_offset = f.tell()
+        except FileNotFoundError:
+            self._notif_offset = 0
+
+
+    def sec_notifications(self) -> None:
+        log = self.query_one("#activity_log", RichLog)
+
+        try:
+            with open(self._notif_path, "r", encoding="utf-8") as f:
+                f.seek(self._notif_offset)
+                chunk = f.read()
+                self._notif_offset = f.tell()
+        except FileNotFoundError:
+            return
+
+        if not chunk:
+            return
+
+        for line in chunk.splitlines():
+            if line.strip():
+                log.write(line)
 
 def run_tui() -> None:
     TaskApp().run()

@@ -23,6 +23,7 @@ class InvalidTaskStatus(Exception):
 class TaskStatus(str, Enum):
     IN_PROGRESS = "in_progress"
     DONE = "done"
+    OVERDUE = "overdue"
 
 
 # =========================
@@ -57,6 +58,10 @@ class Task:
     def mark_in_progress(self) -> None:
         """Marque la tâche comme en cours."""
         self.status = TaskStatus.IN_PROGRESS
+    
+    def mark_overdue(self) -> None:
+        """Marque la tâche comme en retard."""
+        self.status = TaskStatus.OVERDUE
 
     def is_overdue(self) -> bool:
         """Retourne True si la tâche est en retard."""

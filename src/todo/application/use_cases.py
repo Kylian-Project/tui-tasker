@@ -43,10 +43,25 @@ def delete_task(repository: TaskRepository, task_id: int) -> bool:
 # =========================
 
 def get_task(repository: TaskRepository, task_id: int) -> Optional[Task]:
+    task = repository.get(task_id)
+    if task is not None:
+        update_overdue_tasks(repository, [task])
     return repository.get(task_id)
 
 def list_tasks(repository: TaskRepository) -> list[Task]:
-    return repository.list()
+    tasks = repository.list()
+    update_overdue_tasks(repository, tasks)
+    return tasks
+
+
+# =========================
+# Mise à jour des teches en retard
+# =========================
+def update_overdue_tasks(repository: TaskRepository, tasks: list[Task]) -> None:
+    for task in tasks:
+        if (task.is_overdue()):
+            task.status = TaskStatus.OVERDUE
+            repository.update(task)
 
 
 # =========================
@@ -70,8 +85,12 @@ def update_task(
         task.description = description
     if status is not None:
         task.status = TaskStatus(status)
+        if task.status == TaskStatus.IN_PROGRESS:
+            update_overdue_tasks(repository, [task])
     if due_date is not None:
         task.due_date = due_date
+        if (task.status == TaskStatus.OVERDUE and due_date >= date.today()):
+            task.status = TaskStatus.IN_PROGRESS
     else:
         task.due_date = None
 
@@ -98,6 +117,9 @@ def change_task_status(
             task.mark_done()
         elif new_status == TaskStatus.IN_PROGRESS:
             task.mark_in_progress()
+        
+        if task.is_overdue():
+            task.mark_overdue()
 
         notifier.notify(
             f"Tache {task.id} : statut changé de {old_status.value} à {task.status.value}"
