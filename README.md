@@ -1,6 +1,16 @@
-# TUI-Tasker
-
-Task manager with TUI interface and REST API.
+<div align="center">
+  <img src="assets/logo.png" alt="TUI-Tasker Logo" width="200"/>
+  
+  # TUI-Tasker
+  
+  **A modern task manager with Terminal User Interface and REST API**
+  
+  Built with Python, Textual, and FastAPI
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
+  
+</div>
 
 ---
 
