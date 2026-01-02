@@ -78,7 +78,7 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
             yield Static("", id="create_error")
 
             with Grid(id="create_row_title_date"):
-                yield Input(placeholder="Title (required)", id="create_title_input")
+                yield Input(placeholder="Title (required)", max_length=30, id="create_title_input")
                 yield DatePicker(id="create_due_input")
 
             yield TextArea(placeholder="Description (optional)", id="create_desc_input")
@@ -116,13 +116,18 @@ class CreateTaskScreen(ModalScreen[dict[str, Any] | None]):
         title = self.query_one("#create_title_input", Input).value.strip()
         desc = self.query_one("#create_desc_input", TextArea).text.strip() or None
 
-        if not title:
-            self.set_error("> Title is required.")
+        if not title or len(title) > 30:
+            self.set_error("> Title is required or invalid.")
             self.query_one("#create_title_input", Input).focus()
             return
 
         picker = self.query_one("#create_due_input", DatePicker)
         due_before = picker.date
+
+        if desc is not None and len(desc) > 115:
+            self.set_error("> Description is too long (max 115 chars).")
+            self.query_one("#create_desc_input", TextArea).focus()
+            return
 
         due: date | None = None
         if due_before is not None:
@@ -149,7 +154,7 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
             yield Static("", id="edit_error")
 
             with Grid(id="edit_row_title_date"):
-                yield Input(placeholder="Title (required)", id="edit_title_input")
+                yield Input(placeholder="Title (required)", max_length=30, id="edit_title_input")
                 yield DatePicker(id="edit_due_input")
 
             yield TextArea(placeholder="Description (optional)", id="edit_desc_input")
@@ -211,8 +216,8 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
         title = self.query_one("#edit_title_input", Input).value.strip()
         desc_text = self.query_one("#edit_desc_input", TextArea).text
 
-        if not title:
-            self.set_error("> Title is required.")
+        if not title or len(title) > 30:
+            self.set_error("> Title is required or invalid.")
             self.query_one("#edit_title_input", Input).focus()
             return
 
@@ -223,8 +228,10 @@ class EditTaskScreen(ModalScreen[dict[str, Any] | None]):
             due = date(due_before.year, due_before.month, due_before.day)
 
         description = desc_text.strip()
-        if description == "":
-            description = ""
+        if len(description) > 115:
+            self.set_error("> Description is too long (max 115 chars).")
+            self.query_one("#edit_desc_input", TextArea).focus()
+            return
 
         self.dismiss({"title": title, "due_date": due, "description": description})
 
@@ -285,7 +292,10 @@ class TaskApp(App):
         self.theme = "rose-pine-moon"
 
         table = self.query_one("#task_table", DataTable)
-        table.add_columns("ID", "Title", "Status", "Due Date")
+        table.add_column("ID", width=4)
+        table.add_column("Title", width=30)
+        table.add_column("Status", width=12)
+        table.add_column("Due Date", width=12)
         table.cursor_type = "row"
         self.refresh_task_table()
 

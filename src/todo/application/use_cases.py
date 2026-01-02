@@ -16,6 +16,10 @@ def create_task(
     description: Optional[str] = None,
     due_date: Optional[date] = None,
 ) -> Task:
+    if not title or len(title) > 30:
+        raise ValueError("Title is required and must be 1-30 characters long.")
+    if description is not None and len(description) > 115:
+        raise ValueError("Description must not exceed 115 characters.")
     task = Task(
         id=0, # Def par la BDD en auto increment
         title=title,
@@ -86,8 +90,12 @@ def update_task(
     before = (task.title, task.description, task.status, task.due_date)
 
     if title is not None:
+        if not title or len(title) > 30:
+            raise ValueError("Title is required and must be 1-30 characters long.")
         task.title = title
     if description is not None:
+        if len(description) > 115:
+            raise ValueError("Description must not exceed 115 characters.")
         task.description = description
     if status is not None:
         task.status = TaskStatus(status)
