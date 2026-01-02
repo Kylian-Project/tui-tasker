@@ -1,8 +1,12 @@
 from datetime import date
 from typing import Optional, List
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
+
+import os
+from dotenv import load_dotenv
 
 from todo.domain.task import TaskStatus
 from todo.application.use_cases import (
@@ -20,6 +24,21 @@ app = FastAPI(title="TUI-tasker API", version="1.0.0")
 repository = SQLiteTaskRepository()
 notifier = Notif("notifications.txt")
 
+# =========================
+# Verif API key
+# =========================
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def verify_api_key(api_key: str = Security(api_key_header)):
+    if api_key is None or api_key != API_KEY:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API Key"
+        )
+    return api_key
 
 # =========================
 # Vérif Pydantic
@@ -57,7 +76,7 @@ def out(task) -> TaskOut:
 # Endpoints REST
 # =========================
 
-@app.post("/tasks", response_model=TaskOut, status_code=201)
+@app.post("/tasks", response_model=TaskOut, status_code=201, dependencies=[Security(verify_api_key)])
 def api_create_task(payload: TaskCreate):
     task = create_task(
         repository=repository,
@@ -69,19 +88,19 @@ def api_create_task(payload: TaskCreate):
     return out(task)
 
 
-@app.get("/tasks/{id}", response_model=TaskOut)
+@app.get("/tasks/{id}", response_model=TaskOut, dependencies=[Security(verify_api_key)])
 def api_get_task(id: int):
     task = get_task(repository, id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return out(task)
 
-@app.get("/tasks", response_model=List[TaskOut])
+@app.get("/tasks", response_model=List[TaskOut], dependencies=[Security(verify_api_key)])
 def api_list_tasks():
     tasks = list_tasks(repository)
     return [out(t) for t in tasks]
 
-@app.patch("/tasks/{id}", response_model=TaskOut)
+@app.patch("/tasks/{id}", response_model=TaskOut, dependencies=[Security(verify_api_key)])
 def api_update_task(id: int, payload: TaskUpdate):
     # Si le statut est fourni : on utilise change_task_status
     if payload.status is not None:
@@ -125,7 +144,7 @@ def api_update_task(id: int, payload: TaskUpdate):
         return out(updated)
 
 
-@app.delete("/tasks/{id}", status_code=204)
+@app.delete("/tasks/{id}", status_code=204, dependencies=[Security(verify_api_key)])
 def api_delete_task(id: int):
     ok = delete_task(repository, notifier, id)
     if not ok:

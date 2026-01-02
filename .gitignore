@@ -211,3 +211,6 @@ __marimo__/
 
 # Notification logs
 notifications.txt
+
+# ENV files
+.env
