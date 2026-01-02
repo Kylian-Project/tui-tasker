@@ -1,12 +1,12 @@
 [project]
 name = "tui-tasker"
-version = "0.1.0"
+version = "1.0.0"
 description = "A lightweight TUI application for managing tasks directly from the terminal."
 authors = [
     {name = "kylian.gerard",email = "kylian.gerard@etu.unistra.fr"}
 ]
 license = {text = "MIT license"}
-# readme = "README.md"
+readme = "README.md"
 requires-python = ">=3.10,<4.0"
 dependencies = [
     "sqlalchemy (>=2.0.45,<3.0.0)",

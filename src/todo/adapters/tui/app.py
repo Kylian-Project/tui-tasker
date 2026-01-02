@@ -288,7 +288,7 @@ class TaskApp(App):
 
     def on_mount(self) -> None:
         self.title = "Tasker TUI"
-        self.sub_title = "0.1.0"
+        self.sub_title = "1.0.0"
         self.theme = "rose-pine-moon"
 
         table = self.query_one("#task_table", DataTable)
