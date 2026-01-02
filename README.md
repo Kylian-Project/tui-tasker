@@ -1,12 +1,10 @@
-<link href='https://cdn.boxicons.com/3.0.6/fonts/basic/boxicons.min.css' rel='stylesheet'>
-
 # TUI-Tasker
 
 Task manager with TUI interface and REST API.
 
 ---
 
-## <i class='bx  bx-git-branch'></i>  Features
+## <img src="assets/icons/git-branch.png"/> Features
 
 ### TUI
 - Create, edit, delete tasks
@@ -31,23 +29,23 @@ Task manager with TUI interface and REST API.
 
 ---
 
-## Images
+## <img src="assets/icons/image.png"/> Images
 
-- **Main screen**
+- **Main screen**  
 ![TUI main](assets/main.png)
 
-- **Create task**
+- **Create task**  
 ![TUI create](assets/create.png)
 
-- **Edit task**
+- **Edit task**  
 ![TUI edit](assets/edit.png)
 
-- **Actions menu**
+- **Actions menu**  
 ![TUI actions](assets/actions.png)
 
 ---
 
-## <i class='bx  bx-spanner'></i>  Installation
+## <img src="assets/icons/spanner.png"/> Installation
 
 ### User mode
 ```bash
@@ -61,7 +59,7 @@ poetry install --with dev
 
 ---
 
-## <i class='bx  bx-scroll'></i>  Usage
+## <img src="assets/icons/scroll.png"/> Usage
 
 ### Launch TUI
 ```bash
@@ -100,7 +98,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <i class='bx  bx-link'></i>  Dependencies
+## <img src="assets/icons/link.png"/> Dependencies
 
 ### Production
 
@@ -125,7 +123,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <i class='bx  bx-brush-sparkles'></i>  Design & Technical choices
+## <img src="assets/icons/brush-sparkles.png"/> Design & Technical choices
 
 ### Why Textual?
 - **Inspiration**: **Posting** application briefly seen in class and which uses textual.
@@ -153,7 +151,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <i class='bx  bx-building'></i>  Architecture
+## <img src="assets/icons/building.png"/> Architecture
 
 ### Hexagonal (Ports & Adapters)
 
@@ -187,14 +185,14 @@ tui-tasker/
 
 ---
 
-## <i class='bx  bx-check-shield'></i>  Security
+## <img src="assets/icons/check-shield.png"/> Security
 
 - **API Key**: Simple protection for external access
 - **Validation**: Pydantic + use cases to prevent invalid data
 
 ---
 
-## <i class='bx  bx-keyboard'></i>  TUI Shortcuts
+## <img src="assets/icons/keyboard.png"/> TUI Shortcuts
 
 | Key | Action |
 |--------|--------|
@@ -209,7 +207,7 @@ tui-tasker/
 
 ---
 
-## <i class='bx  bx-future'></i>   Future improvements
+## <img src="assets/icons/future.png"/>  Future improvements
 
 - **JWT Authentication**: Replace simple API Key with JWT tokens for better security
 - **User management**: Add user registration, login, and task ownership
@@ -218,19 +216,19 @@ tui-tasker/
 
 ---
 
-## <i class='bx  bx-user-square'></i>  Author
+## <img src="assets/icons/user-square.png"/> Author
 
 This project was built by [Kylian Project](https://github.com/Kylian-Project)
 
 ---
 
-## <i class='bx  bx-law'></i>  License
+## <img src="assets/icons/law.png"/> License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 
-## <i class='bx  bx-book-library'></i>  Resources
+## <img src="assets/icons/book-library.png"/> Resources
 
 - [Textual Documentation](https://textual.textualize.io/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
