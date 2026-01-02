@@ -19,6 +19,9 @@ dependencies = [
     "python-dotenv (>=1.2.1,<2.0.0)"
 ]
 
+[project.scripts]
+tui-tasker = "todo.adapters.tui.app:run_tui"
+
 [tool.poetry]
 packages = [{ include = "todo", from = "src" }]
 

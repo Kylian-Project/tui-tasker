@@ -6,6 +6,7 @@ from sqlalchemy import (
     Date,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
+from pathlib import Path
 
 from todo.domain.task import Task, TaskStatus
 from todo.application.ports import TaskRepository
@@ -15,7 +16,18 @@ from todo.application.ports import TaskRepository
 # Config SQLAlchemy
 # =========================
 
-DATABASE_URL = "sqlite:///todo.db"
+def get_data_dir() -> Path:
+    """Get application data directory, create if not exists."""
+    if Path.home().joinpath("AppData").exists():  # Windows
+        data_dir = Path.home() / "AppData" / "Local" / "tui-tasker"
+    else:  # Linux/Mac
+        data_dir = Path.home() / ".local" / "share" / "tui-tasker"
+    
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return data_dir
+
+DB_PATH = get_data_dir() / "todo.db"
+DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(bind=engine)

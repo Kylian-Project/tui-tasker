@@ -8,10 +8,11 @@ from textual.binding import Binding
 from typing import Any, Optional
 from functools import partial
 from datetime import date
+from pathlib import Path
 from whenever import Date as WheneverDate # type used to set date in DatePicker
 from textual_timepiece.pickers import DatePicker
 
-from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
+from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository, get_data_dir
 from todo.adapters.notifications.notif import Notif
 from todo.application.use_cases import (
     create_task,
@@ -271,7 +272,7 @@ class TaskApp(App):
     def __init__(self):
         super().__init__()
         self.repo = SQLiteTaskRepository()
-        self._notif_path = "notifications.txt"
+        self._notif_path = str(get_data_dir() / "notifications.txt")
         self._notif_offset = 0 # Ne pas lire les anciennes notifications
         self.notifier = Notif(self._notif_path)
         self._selected_task_id: Optional[int] = None

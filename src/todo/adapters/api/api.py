@@ -17,12 +17,12 @@ from todo.application.use_cases import (
     list_tasks,
     change_task_status,
 )
-from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository
+from todo.adapters.persistence.sqlite_repository import SQLiteTaskRepository, get_data_dir
 from todo.adapters.notifications.notif import Notif
 
 app = FastAPI(title="TUI-tasker API", version="1.0.0")
 repository = SQLiteTaskRepository()
-notifier = Notif("notifications.txt")
+notifier = Notif(str(get_data_dir() / "notifications.txt"))
 
 # =========================
 # Verif API key
