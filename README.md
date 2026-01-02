@@ -14,7 +14,7 @@
 
 ---
 
-## <img src="assets/icons/git-branch.png"/> Features
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/git-branch-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/git-branch.png"><img src="assets/icons/git-branch.png"/></picture> Features
 
 ### TUI
 - Create, edit, delete tasks
@@ -39,7 +39,7 @@
 
 ---
 
-## <img src="assets/icons/image.png"/> Images
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/image-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/image.png"><img src="assets/icons/image.png"/></picture> Images
 
 - **Main screen**  
 ![TUI main](assets/main.png)
@@ -55,7 +55,7 @@
 
 ---
 
-## <img src="assets/icons/spanner.png"/> Installation
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/spanner-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/spanner.png"><img src="assets/icons/spanner.png"/></picture> Installation
 
 ### User mode
 ```bash
@@ -69,7 +69,7 @@ poetry install --with dev
 
 ---
 
-## <img src="assets/icons/scroll.png"/> Usage
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/scroll-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/scroll.png"><img src="assets/icons/scroll.png"/></picture> Usage
 
 ### Launch TUI
 ```bash
@@ -108,7 +108,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <img src="assets/icons/link.png"/> Dependencies
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/link-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/link.png"><img src="assets/icons/link.png"/></picture> Dependencies
 
 ### Production
 
@@ -133,7 +133,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <img src="assets/icons/brush-sparkles.png"/> Design & Technical choices
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/brush-sparkles-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/brush-sparkles.png"><img src="assets/icons/brush-sparkles.png"/></picture> Design & Technical choices
 
 ### Why Textual?
 - **Inspiration**: **Posting** application briefly seen in class and which uses textual.
@@ -161,7 +161,7 @@ cd bruno-coll/TUI-tasker
 
 ---
 
-## <img src="assets/icons/building.png"/> Architecture
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/building-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/building.png"><img src="assets/icons/building.png"/></picture> Architecture
 
 ### Hexagonal (Ports & Adapters)
 
@@ -195,14 +195,14 @@ tui-tasker/
 
 ---
 
-## <img src="assets/icons/check-shield.png"/> Security
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/check-shield-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/check-shield.png"><img src="assets/icons/check-shield.png"/></picture> Security
 
 - **API Key**: Simple protection for external access
 - **Validation**: Pydantic + use cases to prevent invalid data
 
 ---
 
-## <img src="assets/icons/keyboard.png"/> TUI Shortcuts
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/keyboard-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/keyboard.png"><img src="assets/icons/keyboard.png"/></picture> TUI Shortcuts
 
 | Key | Action |
 |--------|--------|
@@ -217,7 +217,7 @@ tui-tasker/
 
 ---
 
-## <img src="assets/icons/future.png"/>  Future improvements
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/future-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/future.png"><img src="assets/icons/future.png"/></picture>  Future improvements
 
 - **JWT Authentication**: Replace simple API Key with JWT tokens for better security
 - **User management**: Add user registration, login, and task ownership
@@ -226,19 +226,19 @@ tui-tasker/
 
 ---
 
-## <img src="assets/icons/user-square.png"/> Author
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/user-square-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/user-square.png"><img src="assets/icons/user-square.png"/></picture> Author
 
 This project was built by [Kylian Project](https://github.com/Kylian-Project)
 
 ---
 
-## <img src="assets/icons/law.png"/> License
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/law-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/law.png"><img src="assets/icons/law.png"/></picture> License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 
-## <img src="assets/icons/book-library.png"/> Resources
+## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/book-library-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/book-library.png"><img src="assets/icons/book-library.png"/></picture> Resources
 
 - [Textual Documentation](https://textual.textualize.io/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
