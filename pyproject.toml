@@ -28,5 +28,7 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "textual-dev (>=1.8.0,<2.0.0)"
+    "textual-dev (>=1.8.0,<2.0.0)",
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)"
 ]
