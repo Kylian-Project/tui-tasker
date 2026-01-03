@@ -9,6 +9,7 @@
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
   [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
+  [![PyPI](https://img.shields.io/pypi/v/tui-tasker.svg)](https://pypi.org/project/tui-tasker/)
   
 </div>
 
@@ -57,12 +58,19 @@
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/spanner-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/spanner.png"><img src="assets/icons/spanner.png"/></picture> Installation
 
-### User mode
+### Via pip (recommended)
+```bash
+pip install tui-tasker
+```
+
+### Via Poetry (development)
+
+#### User mode
 ```bash
 poetry install
 ```
 
-### Dev mode
+#### Dev mode
 ```bash
 poetry install --with dev
 ```
@@ -73,6 +81,10 @@ poetry install --with dev
 
 ### Launch TUI
 ```bash
+# If installed via pip
+tui-tasker
+
+# If using Poetry
 poetry run python -m todo.adapters.tui.app
 ```
 

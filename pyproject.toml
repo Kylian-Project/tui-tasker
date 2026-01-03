@@ -1,6 +1,6 @@
 [project]
 name = "tui-tasker"
-version = "1.0.0"
+version = "1.0.2"
 description = "A lightweight TUI application for managing tasks directly from the terminal."
 authors = [
     {name = "kylian.gerard",email = "kylian.gerard@etu.unistra.fr"}
