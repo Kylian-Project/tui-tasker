@@ -205,6 +205,11 @@ tui-tasker/
 └── notifications.txt            # Action log (auto-created)
 ```
 
+### Diagram
+> Made using [mermaid.live](https://mermaid.live/)
+
+![Architecture diagram](assets/schema.svg)
+
 ---
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="assets/icons/check-shield-light.png"><source media="(prefers-color-scheme: light)" srcset="assets/icons/check-shield.png"><img src="assets/icons/check-shield.png"/></picture> Security
